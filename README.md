@@ -25,6 +25,9 @@ The API is very similar to [AsyncMqttClient](https://github.com/marvinroger/asyn
 - Handles reconnects automatically
 - Automatically embeds a X509 Root CA Bundle into the binary on platformio
 
+> [!IMPORTANT]
+> This library is not actively tested with the Arduino IDE, but reported to compile. If the SSL certificates shall be bundled it requires the build system of [platformio](https://platformio.org/) or [pioarduino](https://github.com/pioarduino/platform-espressif32).
+
 ## Usage
 
 MQTT has never been easier to use. Instantiate the MQTT client, set the server URI, and subscribe to a topic with the `onTopic()` event handler. Easy to use with a lambda function where you can work with the received payload. Connect the MQTT client to the server and you're set. Publish works as expected from any other MQTT client.
@@ -168,13 +171,13 @@ Otherwise the bundle will be overwritten by the MQTT client with unwanted side e
 
 ## Advanced Usage
 
-Check the commented header file and the `FullyFeatured` example for a complete list of all event handlers and configuration options. You can even get access to the ESP-IDF MQTT Clients' configuration object, should you need parameters not broken out to the API.
+Check the [documentation](/documentation.md) or the commented header file and the `FullyFeatured` example for a complete list of all event handlers and configuration options. You can even get access to the ESP-IDF MQTT Clients' configuration object, should you need parameters not broken out to the API.
 
 ## License
 
 MIT License
 
-Copyright (c) 2024 elims
+Copyright (c) 2025 elims
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

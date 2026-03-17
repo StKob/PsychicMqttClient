@@ -1,6 +1,6 @@
 #include "PsychicMqttClient.h"
 
-static const char *TAG = "PsychicMqttClient";
+static const char *TAG = "🐙";
 
 static void log_error_if_nonzero(const char *message, int error_code)
 {
@@ -121,6 +121,23 @@ PsychicMqttClient &PsychicMqttClient::setCredentials(const char *username, const
     if (password != nullptr)
         _mqtt_cfg.credentials.authentication.password = password;
 
+    return *this;
+}
+
+PsychicMqttClient &PsychicMqttClient::setClientCertificate(const char *clientCert, const char *clientKey,
+                                                           size_t clientCertLen, size_t clientKeyLen)
+{
+#if ESP_IDF_VERSION_MAJOR == 5
+    _mqtt_cfg.credentials.authentication.certificate = clientCert;
+    _mqtt_cfg.credentials.authentication.key = clientKey;
+    _mqtt_cfg.credentials.authentication.certificate_len = clientCertLen;
+    _mqtt_cfg.credentials.authentication.key_len = clientKeyLen;
+#else
+    _mqtt_cfg.client_cert_pem = clientCert;
+    _mqtt_cfg.client_key_pem = clientKey;
+    _mqtt_cfg.client_cert_len = clientCertLen;
+    _mqtt_cfg.client_key_len = clientKeyLen;
+#endif
     return *this;
 }
 
@@ -412,12 +429,12 @@ void PsychicMqttClient::_onMessage(esp_mqtt_event_handle_t &event)
         ESP_LOGV(TAG, "MQTT_EVENT_DATA_SINGLE");
         // Copy the characters from data->data_ptr to c-string
         char payload[event->data_len + 1];
-        strncpy(payload, (char *)event->data, event->data_len);
+        memcpy(payload, (char *)event->data, event->data_len);
         payload[event->data_len] = '\0';
         ESP_LOGV(TAG, "Payload=%s", payload);
 
         char topic[event->topic_len + 1];
-        strncpy(topic, (char *)event->topic, event->topic_len);
+        memcpy(topic, (char *)event->topic, event->topic_len);
         topic[event->topic_len] = '\0';
         ESP_LOGV(TAG, "Topic=%s", topic);
 
@@ -437,11 +454,11 @@ void PsychicMqttClient::_onMessage(esp_mqtt_event_handle_t &event)
         // Allocate memory for the buffer
         _buffer = (char *)malloc(event->total_data_len + 1);
         // Copy the characters from even->data to _buffer
-        strncpy(_buffer, (char *)event->data, event->data_len);
+        memcpy(_buffer, (char *)event->data, event->data_len);
 
         // Store the topic for later use, as it is only sent with the first message
         _topic = (char *)malloc(event->topic_len + 1);
-        strncpy(_topic, (char *)event->topic, event->topic_len);
+        memcpy(_topic, (char *)event->topic, event->topic_len);
         _topic[event->topic_len] = '\0';
     }
 
@@ -450,7 +467,7 @@ void PsychicMqttClient::_onMessage(esp_mqtt_event_handle_t &event)
     {
         ESP_LOGV(TAG, "MQTT_EVENT_DATA_MULTIPART_LAST");
         // Copy the characters from even->data to _buffer
-        strncpy(_buffer + event->current_data_offset, (char *)event->data, event->data_len);
+        memcpy(_buffer + event->current_data_offset, (char *)event->data, event->data_len);
         _buffer[event->total_data_len] = '\0';
         ESP_LOGV(TAG, "Topic=%s", _topic);
         ESP_LOGV(TAG, "Payload=%s", _buffer);
@@ -465,14 +482,16 @@ void PsychicMqttClient::_onMessage(esp_mqtt_event_handle_t &event)
 
         // Free the memory
         free(_buffer);
+        _buffer = nullptr;
         free(_topic);
+        _topic = nullptr;
     }
 
     // Otherwise, we are in the middle of the message
     else
     {
         // copy the characters from even->data to _buffer
-        strncpy(_buffer + event->current_data_offset, (char *)event->data, event->data_len);
+        memcpy(_buffer + event->current_data_offset, (char *)event->data, event->data_len);
         ESP_LOGV(TAG, "MQTT_EVENT_DATA_MULTIPART");
     }
 }
