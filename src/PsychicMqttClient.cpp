@@ -135,12 +135,12 @@ PsychicMqttClient &PsychicMqttClient::setCACertBundle(const uint8_t *bundle, siz
 #else
     if (bundle != nullptr)
     {
-        arduino_esp_crt_bundle_set(bundle);
-        _mqtt_cfg.crt_bundle_attach = arduino_esp_crt_bundle_attach;
+        esp_crt_bundle_set(bundle, bundleLen);
+        _mqtt_cfg.crt_bundle_attach = esp_crt_bundle_attach;
     }
     else
     {
-        arduino_esp_crt_bundle_detach(NULL);
+        esp_crt_bundle_detach(NULL);
         _mqtt_cfg.crt_bundle_attach = NULL;
     }
 #endif
@@ -156,7 +156,7 @@ PsychicMqttClient &PsychicMqttClient::attachArduinoCACertBundle(bool attach)
         _mqtt_cfg.broker.verification.crt_bundle_attach = NULL;
 #else
     if (attach)
-        _mqtt_cfg.crt_bundle_attach = arduino_esp_crt_bundle_attach;
+        _mqtt_cfg.crt_bundle_attach = esp_crt_bundle_attach;
     else
         _mqtt_cfg.crt_bundle_attach = NULL;
 #endif
