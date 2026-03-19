@@ -1,0 +1,20 @@
+## IDF Component Manager Manifest File
+version: "0.2.4"
+license: "MIT"
+description: "Fully featured asynchronous Arduino MQTT client for ESP32 with full support for SSL/TLS and MQTT over websocket"
+url: "https://github.com/theelims/PsychicMqttClient"
+repository: "https://github.com/theelims/PsychicMqttClient"
+documentation: "https://github.com/theelims/PsychicMqttClient/blob/main/documentation.md"
+tags:
+  - mqtt
+  - asynchronous
+
+dependencies:
+  espressif/arduino-esp32:
+    matches:
+      - if: "idf_version ^4"
+        version: "^2"
+      - if: "idf_version ^5.1"
+        version: "^3.0"
+      - if: "idf_version ^5.4"
+        version: "3.2.0"
